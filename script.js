@@ -2,61 +2,48 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Initialize database
-        await window.db.initDB();
+        await window.db.init();
         
         // Setup login form
         const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginMessage = document.getElementById('loginMessage');
+
         if (loginForm) {
-            loginForm.addEventListener('submit', handleLogin);
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                if (!username || !password) {
+                    utils.showNotification('Por favor, preencha todos os campos.', 'error');
+                    return;
+                }
+
+                try {
+                    // Tenta fazer login
+                    const success = await utils.login(username, password);
+                    
+                    if (success) {
+                        // Redireciona para o dashboard
+                        window.location.href = 'dashboard.html';
+                    } else {
+                        // Mostra mensagem de erro
+                        utils.showNotification('Usuário ou senha inválidos', 'error');
+                    }
+                } catch (error) {
+                    console.error('Erro ao fazer login:', error);
+                    utils.showNotification('Erro ao fazer login. Tente novamente.', 'error');
+                }
+            });
         }
     } catch (error) {
         console.error('Erro ao inicializar o banco de dados:', error);
-        showMessage('Erro ao inicializar o banco de dados', 'error');
+        utils.showNotification('Erro ao inicializar o banco de dados', 'error');
     }
 });
-
-// Handle login form submission
-async function handleLogin(event) {
-    event.preventDefault();
-    
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    
-    try {
-        const user = await window.db.authenticateUser(username, password);
-        
-        if (!user) {
-            throw new Error('Usuário ou senha inválidos');
-        }
-
-        // Store user session
-        sessionStorage.setItem('user', JSON.stringify({
-            id: user.id,
-            name: user.username,
-            login: user.username,
-            role: user.role,
-            storeId: user.storeId
-        }));
-
-        // Redirect based on user role
-        switch (user.role) {
-            case 'ADMIN':
-                window.location.href = 'admin.html';
-                break;
-            case 'OWNER':
-            case 'MANAGER':
-                window.location.href = 'dashboard.html';
-                break;
-            case 'EMPLOYEE':
-                window.location.href = 'pdv.html';
-                break;
-            default:
-                showMessage('Tipo de usuário inválido', 'error');
-        }
-    } catch (error) {
-        showMessage(error.message || 'Erro ao fazer login', 'error');
-    }
-}
 
 // Show message to user
 function showMessage(message, type = 'error') {
@@ -128,5 +115,48 @@ window.utils = {
     logout,
     formatCurrency,
     formatDate,
-    logActivity
+    logActivity,
+    login: async (username, password) => {
+        try {
+            const user = await window.db.authenticateUser(username, password);
+            
+            if (!user) {
+                throw new Error('Usuário ou senha inválidos');
+            }
+
+            // Store user session
+            sessionStorage.setItem('user', JSON.stringify({
+                id: user.id,
+                name: user.username,
+                login: user.username,
+                role: user.role,
+                storeId: user.storeId
+            }));
+
+            // Redirect based on user role
+            switch (user.role) {
+                case 'ADMIN':
+                    window.location.href = 'admin.html';
+                    break;
+                case 'OWNER':
+                case 'MANAGER':
+                    window.location.href = 'dashboard.html';
+                    break;
+                case 'EMPLOYEE':
+                    window.location.href = 'pdv.html';
+                    break;
+                default:
+                    showMessage('Tipo de usuário inválido', 'error');
+                    return false;
+            }
+            return true;
+        } catch (error) {
+            console.error('Erro ao fazer login:', error);
+            showMessage(error.message || 'Erro ao fazer login', 'error');
+            return false;
+        }
+    },
+    showNotification: function(message, type) {
+        showMessage(message, type);
+    }
 }; 

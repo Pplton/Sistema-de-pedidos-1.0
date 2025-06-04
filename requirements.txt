@@ -1,0 +1,1 @@
+# Não são necessárias dependências externas para trabalhar com JSON 

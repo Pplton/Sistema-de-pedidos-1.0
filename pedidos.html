@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos - Doceria</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="pedidos.css">
+</head>
+<body class="dashboard-page">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-cookie-bite logo-icon"></i>
+            <h1>Doceria</h1>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="pedidos.html" class="nav-item active">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Pedidos</span>
+            </a>
+            <a href="produtos.html" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>Produtos</span>
+            </a>
+            <a href="categorias.html" class="nav-item">
+                <i class="fas fa-tags"></i>
+                <span>Categorias</span>
+            </a>
+            <a href="relatorios.html" class="nav-item">
+                <i class="fas fa-file-alt"></i>
+                <span>Relatórios</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button onclick="utils.logout()" class="btn-logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-bar">
+            <button id="sidebarToggle" class="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="user-info">
+                <span id="currentUser">Olá, Admin</span>
+                <button class="logout-btn" onclick="utils.logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sair
+                </button>
+                <img src="https://ui-avatars.com/api/?name=Admin&background=FF85A2&color=fff" alt="User" class="avatar">
+            </div>
+        </header>
+
+        <div class="orders-content">
+            <div class="content-header">
+                <h1>Pedidos</h1>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="exportOrders()">
+                        <i class="fas fa-file-export"></i>
+                        Exportar
+                    </button>
+                    <button class="btn-primary" onclick="showNewOrderModal()">
+                        <i class="fas fa-plus"></i>
+                        Novo Pedido
+                    </button>
+                </div>
+            </div>
+
+            <div class="orders-filters">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="orderSearch" placeholder="Buscar pedidos...">
+                </div>
+                <div class="filter-group">
+                    <select id="statusFilter">
+                        <option value="">Todos os status</option>
+                        <option value="pending">Pendente</option>
+                        <option value="preparing">Em preparo</option>
+                        <option value="ready">Pronto</option>
+                        <option value="delivered">Entregue</option>
+                        <option value="cancelled">Cancelado</option>
+                    </select>
+                    <input type="date" id="dateFilter">
+                </div>
+            </div>
+
+            <div class="orders-table-container">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Data</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <!-- Orders will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- New Order Modal -->
+    <div id="newOrderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Pedido</h2>
+                <button onclick="closeModal('newOrderModal')" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="newOrderForm">
+                <div class="form-group">
+                    <label for="customerName">Nome do Cliente</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="customerPhone">Telefone</label>
+                    <input type="tel" id="customerPhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryAddress">Endereço de Entrega</label>
+                    <textarea id="deliveryAddress" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Produtos</label>
+                    <div id="productsList" class="products-list">
+                        <!-- Products will be loaded here -->
+                    </div>
+                    <button type="button" class="btn-secondary" onclick="addProductToOrder()">
+                        <i class="fas fa-plus"></i>
+                        Adicionar Produto
+                    </button>
+                </div>
+                <div class="order-summary">
+                    <div class="summary-item">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">R$ 0,00</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Taxa de Entrega:</span>
+                        <span id="deliveryFee">R$ 0,00</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>Total:</span>
+                        <span id="total">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i>
+                        Salvar Pedido
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('newOrderModal')">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="orderDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes do Pedido</h2>
+                <button onclick="closeModal('orderDetailsModal')" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="orderDetailsContent">
+                <!-- Order details will be loaded here -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="updateOrderStatus()">
+                    <i class="fas fa-sync"></i>
+                    Atualizar Status
+                </button>
+                <button class="btn-secondary" onclick="closeModal('orderDetailsModal')">
+                    <i class="fas fa-times"></i>
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="db.js"></script>
+    <script src="utils.js"></script>
+    <script src="pedidos.js"></script>
+</body>
+</html> 

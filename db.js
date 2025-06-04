@@ -1,199 +1,167 @@
 // Database configuration
-const DB_NAME = 'doceriaDB';
-const DB_VERSION = 1;
+const DB = {
+    // Nomes dos arquivos JSON
+    FILES: {
+        USERS: 'data/users.json',
+        STORES: 'data/stores.json',
+        PRODUCTS: 'data/products.json',
+        CATEGORIES: 'data/categories.json',
+        ORDERS: 'data/orders.json',
+        THEMES: 'data/themes.json'
+    },
 
-// Store names
-const STORES = {
-    USERS: 'users',
-    STORES: 'stores',
-    PRODUCTS: 'products',
-    CATEGORIES: 'categories',
-    ORDERS: 'orders',
-    LOGS: 'logs'
-};
-
-// Initialize database
-const initDB = () => {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-        request.onerror = (event) => {
-            console.error('Erro ao abrir o banco de dados:', event.target.error);
-            reject(new Error('Erro ao abrir o banco de dados'));
-        };
-
-        request.onsuccess = (event) => {
-            const db = event.target.result;
-            resolve(db);
-        };
-
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-
-            // Create stores if they don't exist
-            if (!db.objectStoreNames.contains(STORES.USERS)) {
-                const userStore = db.createObjectStore(STORES.USERS, { keyPath: 'id', autoIncrement: true });
-                userStore.createIndex('username', 'username', { unique: true });
-                userStore.createIndex('storeId', 'storeId', { unique: false });
+    // Inicializa o banco de dados
+    async init() {
+        try {
+            // Verifica se a pasta data existe
+            if (!await this.checkDataFolder()) {
+                await this.createDataFolder();
             }
 
-            if (!db.objectStoreNames.contains(STORES.STORES)) {
-                const storeStore = db.createObjectStore(STORES.STORES, { keyPath: 'id', autoIncrement: true });
-                storeStore.createIndex('name', 'name', { unique: true });
-            }
+            // Verifica se os arquivos existem, se não, cria com dados padrão
+            await this.initializeFiles();
+            return true;
+        } catch (error) {
+            console.error('Erro ao inicializar banco de dados:', error);
+            throw error;
+        }
+    },
 
-            if (!db.objectStoreNames.contains(STORES.PRODUCTS)) {
-                const productStore = db.createObjectStore(STORES.PRODUCTS, { keyPath: 'id', autoIncrement: true });
-                productStore.createIndex('categoryId', 'categoryId', { unique: false });
-                productStore.createIndex('storeId', 'storeId', { unique: false });
-            }
+    // Verifica se a pasta data existe
+    async checkDataFolder() {
+        try {
+            const response = await fetch('data/');
+            return response.ok;
+        } catch {
+            return false;
+        }
+    },
 
-            if (!db.objectStoreNames.contains(STORES.CATEGORIES)) {
-                const categoryStore = db.createObjectStore(STORES.CATEGORIES, { keyPath: 'id', autoIncrement: true });
-                categoryStore.createIndex('storeId', 'storeId', { unique: false });
-            }
+    // Cria a pasta data
+    async createDataFolder() {
+        try {
+            await fetch('data/', { method: 'POST' });
+        } catch (error) {
+            console.error('Erro ao criar pasta data:', error);
+            throw error;
+        }
+    },
 
-            if (!db.objectStoreNames.contains(STORES.ORDERS)) {
-                const orderStore = db.createObjectStore(STORES.ORDERS, { keyPath: 'id', autoIncrement: true });
-                orderStore.createIndex('storeId', 'storeId', { unique: false });
-                orderStore.createIndex('status', 'status', { unique: false });
-                orderStore.createIndex('pickupTime', 'pickupTime', { unique: false });
-            }
-
-            if (!db.objectStoreNames.contains(STORES.LOGS)) {
-                const logStore = db.createObjectStore(STORES.LOGS, { keyPath: 'id', autoIncrement: true });
-                logStore.createIndex('timestamp', 'timestamp', { unique: false });
-                logStore.createIndex('userId', 'userId', { unique: false });
-            }
-
-            // Create initial admin user
-            const userStore = event.target.transaction.objectStore(STORES.USERS);
-            userStore.add({
+    // Inicializa os arquivos com dados padrão
+    async initializeFiles() {
+        // Dados padrão para usuários
+        const defaultUsers = [
+            {
                 username: 'admin',
-                password: 'admin123', // In production, this should be hashed
-                role: 'ADMIN',
-                storeId: null,
-                createdAt: new Date()
-            });
-        };
-    });
-};
+                password: 'admin123',
+                storeId: 'default',
+                role: 'admin'
+            }
+        ];
 
-// Generic function to add data to a store
-const addData = (storeName, data) => {
-    return new Promise((resolve, reject) => {
-        initDB().then(db => {
-            const transaction = db.transaction(storeName, 'readwrite');
-            const store = transaction.objectStore(storeName);
-            const request = store.add(data);
-
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        }).catch(reject);
-    });
-};
-
-// Generic function to get data from a store
-const getData = (storeName, id) => {
-    return new Promise((resolve, reject) => {
-        initDB().then(db => {
-            const transaction = db.transaction(storeName, 'readonly');
-            const store = transaction.objectStore(storeName);
-            const request = store.get(id);
-
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        }).catch(reject);
-    });
-};
-
-// Generic function to update data in a store
-const updateData = (storeName, id, data) => {
-    return new Promise((resolve, reject) => {
-        initDB().then(db => {
-            const transaction = db.transaction(storeName, 'readwrite');
-            const store = transaction.objectStore(storeName);
-            const request = store.put({ ...data, id });
-
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        }).catch(reject);
-    });
-};
-
-// Generic function to delete data from a store
-const deleteData = (storeName, id) => {
-    return new Promise((resolve, reject) => {
-        initDB().then(db => {
-            const transaction = db.transaction(storeName, 'readwrite');
-            const store = transaction.objectStore(storeName);
-            const request = store.delete(id);
-
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        }).catch(reject);
-    });
-};
-
-// Function to get all data from a store
-const getAllData = (storeName) => {
-    return new Promise((resolve, reject) => {
-        initDB().then(db => {
-            const transaction = db.transaction(storeName, 'readonly');
-            const store = transaction.objectStore(storeName);
-            const request = store.getAll();
-
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = () => reject(request.error);
-        }).catch(reject);
-    });
-};
-
-// Function to authenticate user
-const authenticateUser = (username, password) => {
-    return new Promise((resolve, reject) => {
-        initDB().then(db => {
-            const transaction = db.transaction(STORES.USERS, 'readonly');
-            const store = transaction.objectStore(STORES.USERS);
-            const index = store.index('username');
-            const request = index.get(username);
-
-            request.onsuccess = () => {
-                const user = request.result;
-                if (user && user.password === password) {
-                    resolve(user);
-                } else {
-                    reject(new Error('Usuário ou senha inválidos'));
+        // Dados padrão para lojas
+        const defaultStores = [
+            {
+                id: 'default',
+                name: 'EvoApps',
+                theme: {
+                    primaryColor: '#1a237e',
+                    primaryLight: '#534bae',
+                    primaryDark: '#000051',
+                    secondaryColor: '#2196f3',
+                    secondaryLight: '#6ec6ff',
+                    secondaryDark: '#0069c0',
+                    accentColor: '#00bcd4',
+                    accentLight: '#62efff',
+                    accentDark: '#008ba3'
                 }
-            };
-            request.onerror = () => reject(new Error('Erro ao autenticar usuário'));
-        }).catch(reject);
-    });
+            }
+        ];
+
+        // Cria os arquivos se não existirem
+        await this.saveToJSON(this.FILES.USERS, defaultUsers);
+        await this.saveToJSON(this.FILES.STORES, defaultStores);
+        await this.saveToJSON(this.FILES.PRODUCTS, []);
+        await this.saveToJSON(this.FILES.CATEGORIES, []);
+        await this.saveToJSON(this.FILES.ORDERS, []);
+        await this.saveToJSON(this.FILES.THEMES, []);
+    },
+
+    // Salva dados em um arquivo JSON
+    async saveToJSON(file, data) {
+        try {
+            const response = await fetch(file, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            return response.ok;
+        } catch (error) {
+            console.error(`Erro ao salvar em ${file}:`, error);
+            throw error;
+        }
+    },
+
+    // Lê dados de um arquivo JSON
+    async readFromJSON(file) {
+        try {
+            const response = await fetch(file);
+            if (!response.ok) {
+                return [];
+            }
+            return await response.json();
+        } catch (error) {
+            console.error(`Erro ao ler de ${file}:`, error);
+            return [];
+        }
+    },
+
+    // Funções específicas para cada tipo de dado
+    async getUser(username) {
+        const users = await this.readFromJSON(this.FILES.USERS);
+        return users.find(user => user.username === username);
+    },
+
+    async getStoreTheme(storeId) {
+        const themes = await this.readFromJSON(this.FILES.THEMES);
+        return themes.find(theme => theme.storeId === storeId);
+    },
+
+    async saveUser(user) {
+        const users = await this.readFromJSON(this.FILES.USERS);
+        const index = users.findIndex(u => u.username === user.username);
+        if (index >= 0) {
+            users[index] = user;
+        } else {
+            users.push(user);
+        }
+        return await this.saveToJSON(this.FILES.USERS, users);
+    },
+
+    async saveStore(store) {
+        const stores = await this.readFromJSON(this.FILES.STORES);
+        const index = stores.findIndex(s => s.id === store.id);
+        if (index >= 0) {
+            stores[index] = store;
+        } else {
+            stores.push(store);
+        }
+        return await this.saveToJSON(this.FILES.STORES, stores);
+    },
+
+    async saveTheme(theme) {
+        const themes = await this.readFromJSON(this.FILES.THEMES);
+        const index = themes.findIndex(t => t.storeId === theme.storeId);
+        if (index >= 0) {
+            themes[index] = theme;
+        } else {
+            themes.push(theme);
+        }
+        return await this.saveToJSON(this.FILES.THEMES, themes);
+    }
 };
 
-// Function to clear a store
-const clearStore = (storeName) => {
-    return new Promise((resolve, reject) => {
-        initDB().then(db => {
-            const transaction = db.transaction(storeName, 'readwrite');
-            const store = transaction.objectStore(storeName);
-            const request = store.clear();
-
-            request.onsuccess = () => resolve();
-            request.onerror = () => reject(request.error);
-        }).catch(reject);
-    });
-};
-
-// Export functions
-window.db = {
-    initDB,
-    addData,
-    getData,
-    updateData,
-    deleteData,
-    getAllData,
-    authenticateUser,
-    clearStore,
-    STORES
-}; 
+// Exporta o objeto DB para uso global
+window.db = DB; 
