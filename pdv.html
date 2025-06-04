@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDV - Sistema de Vendas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="pdv.css">
+</head>
+<body>
+    <div class="pdv-container">
+        <!-- Header -->
+        <header class="pdv-header">
+            <h1>Sistema de Vendas</h1>
+            <div class="header-actions">
+                <button onclick="showAdminAccess()" class="btn btn-secondary">Admin</button>
+                <button onclick="showDashboardAccess()" class="btn btn-secondary">Dashboard</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="pdv-content">
+            <!-- Products Panel -->
+            <section class="products-panel">
+                <div class="search-bar">
+                    <input type="text" id="productSearch" placeholder="Buscar produtos...">
+                </div>
+                <div class="categories-list" id="categoriesList">
+                    <!-- Categories will be loaded here -->
+                </div>
+                <div id="productsList">
+                    <!-- Products will be loaded here -->
+                </div>
+                <div id="productsGrid">
+                    <!-- Products grid will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Order Panel -->
+            <section class="order-panel">
+                <div class="order-header">
+                    <h2>Pedido Atual</h2>
+                </div>
+                <div class="customer-info">
+                    <input type="text" id="customerName" placeholder="Nome do Cliente" required>
+                    <input type="tel" id="customerPhone" placeholder="Telefone (opcional)">
+                </div>
+                <div class="order-items" id="orderItems">
+                    <!-- Order items will be displayed here -->
+                </div>
+                <div class="order-summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">R$ 0,00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Total:</span>
+                        <span id="total">R$ 0,00</span>
+                    </div>
+                </div>
+                <div class="order-actions">
+                    <button onclick="clearOrder()" class="btn btn-secondary">Limpar</button>
+                    <button onclick="saveOrder()" class="btn btn-primary">Salvar</button>
+                    <button onclick="finishOrder()" class="btn btn-primary">Finalizar</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Autenticação</h3>
+                <button onclick="closeModal('authModal')" class="close-btn">&times;</button>
+            </div>
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="authUsername">Usuário</label>
+                    <input type="text" id="authUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="authPassword">Senha</label>
+                    <input type="password" id="authPassword" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="db.js"></script>
+    <script src="utils.js"></script>
+    <script src="pdv.js"></script>
+</body>
+</html> 

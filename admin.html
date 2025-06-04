@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Doceria</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body class="admin-page">
+    <header class="admin-header">
+        <div class="header-left">
+            <h1>Admin - Doceria</h1>
+            <span id="currentUser"></span>
+        </div>
+        <div class="header-right">
+            <button onclick="utils.logout()" class="btn-secondary">Sair</button>
+        </div>
+    </header>
+
+    <main class="admin-container">
+        <nav class="admin-nav">
+            <button class="nav-item active" data-panel="users">Usuários</button>
+            <button class="nav-item" data-panel="stores">Lojas</button>
+            <button class="nav-item" data-panel="backup">Backup</button>
+        </nav>
+
+        <div class="admin-content">
+            <!-- Users Panel -->
+            <div class="panel active" id="users">
+                <div class="panel-header">
+                    <h2>Gestão de Usuários</h2>
+                    <div class="filters">
+                        <select id="userStore">
+                            <option value="ALL">Todas as Lojas</option>
+                            <!-- Stores will be loaded here -->
+                        </select>
+                        <select id="userRole">
+                            <option value="ALL">Todos os Cargos</option>
+                            <option value="ADMIN">Administrador</option>
+                            <option value="OWNER">Proprietário</option>
+                            <option value="MANAGER">Gerente</option>
+                            <option value="EMPLOYEE">Funcionário</option>
+                        </select>
+                        <button class="btn-primary" onclick="showAddUserModal()">Novo Usuário</button>
+                    </div>
+                </div>
+                <div class="users-list" id="usersList">
+                    <!-- Users will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Stores Panel -->
+            <div class="panel" id="stores">
+                <div class="panel-header">
+                    <h2>Gestão de Lojas</h2>
+                    <button class="btn-primary" onclick="showAddStoreModal()">Nova Loja</button>
+                </div>
+                <div class="stores-list" id="storesList">
+                    <!-- Stores will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Backup Panel -->
+            <div class="panel" id="backup">
+                <div class="panel-header">
+                    <h2>Backup do Sistema</h2>
+                </div>
+                <div class="backup-content">
+                    <div class="backup-info">
+                        <h3>Último Backup</h3>
+                        <p id="lastBackup">Nunca realizado</p>
+                    </div>
+                    <div class="backup-actions">
+                        <button class="btn-primary" onclick="createBackup()">Criar Backup</button>
+                        <button class="btn-secondary" onclick="document.getElementById('restoreFile').click()">Restaurar Backup</button>
+                        <input type="file" id="restoreFile" accept=".json" style="display: none" onchange="restoreBackup(this.files[0])">
+                    </div>
+                    <div class="backup-settings">
+                        <h3>Configurações de Backup</h3>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="autoBackup" checked>
+                                Backup automático a cada 6 horas
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="backupOnExit" checked>
+                                Backup ao fechar o navegador
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-content">
+            <h2>Novo Usuário</h2>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label for="userName">Nome</label>
+                    <input type="text" id="userName" required>
+                </div>
+                <div class="form-group">
+                    <label for="userUsername">Login</label>
+                    <input type="text" id="userUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Senha</label>
+                    <input type="password" id="userPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="userRole">Cargo</label>
+                    <select id="userRole" required>
+                        <option value="ADMIN">Administrador</option>
+                        <option value="OWNER">Proprietário</option>
+                        <option value="MANAGER">Gerente</option>
+                        <option value="EMPLOYEE">Funcionário</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="userStore">Loja</label>
+                    <select id="userStore" required>
+                        <!-- Stores will be loaded here -->
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Salvar</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('addUserModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Store Modal -->
+    <div id="addStoreModal" class="modal">
+        <div class="modal-content">
+            <h2>Nova Loja</h2>
+            <form id="addStoreForm">
+                <div class="form-group">
+                    <label for="storeName">Nome</label>
+                    <input type="text" id="storeName" required>
+                </div>
+                <div class="form-group">
+                    <label for="storeAddress">Endereço</label>
+                    <input type="text" id="storeAddress" required>
+                </div>
+                <div class="form-group">
+                    <label for="storePhone">Telefone</label>
+                    <input type="tel" id="storePhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="storeEmail">E-mail</label>
+                    <input type="email" id="storeEmail" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Salvar</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('addStoreModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <h2>Editar Usuário</h2>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label for="editUserName">Nome</label>
+                    <input type="text" id="editUserName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserUsername">Login</label>
+                    <input type="text" id="editUserUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="editUserPassword">Nova Senha (deixe em branco para manter a atual)</label>
+                    <input type="password" id="editUserPassword">
+                </div>
+                <div class="form-group">
+                    <label for="editUserRole">Cargo</label>
+                    <select id="editUserRole" required>
+                        <option value="ADMIN">Administrador</option>
+                        <option value="OWNER">Proprietário</option>
+                        <option value="MANAGER">Gerente</option>
+                        <option value="EMPLOYEE">Funcionário</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editUserStore">Loja</label>
+                    <select id="editUserStore" required>
+                        <!-- Stores will be loaded here -->
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Salvar</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('editUserModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Store Modal -->
+    <div id="editStoreModal" class="modal">
+        <div class="modal-content">
+            <h2>Editar Loja</h2>
+            <form id="editStoreForm">
+                <input type="hidden" id="editStoreId">
+                <div class="form-group">
+                    <label for="editStoreName">Nome</label>
+                    <input type="text" id="editStoreName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editStoreAddress">Endereço</label>
+                    <input type="text" id="editStoreAddress" required>
+                </div>
+                <div class="form-group">
+                    <label for="editStorePhone">Telefone</label>
+                    <input type="tel" id="editStorePhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="editStoreEmail">E-mail</label>
+                    <input type="email" id="editStoreEmail" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Salvar</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('editStoreModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="db.js"></script>
+    <script src="script.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html> 

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Doceria</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="dashboard-page">
+    <header class="dashboard-header">
+        <div class="header-left">
+            <h1>Dashboard - Doceria</h1>
+            <span id="currentStore"></span>
+        </div>
+        <div class="header-right">
+            <span id="currentUser"></span>
+            <button onclick="utils.logout()" class="btn-secondary">Sair</button>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <nav class="dashboard-nav">
+            <button class="nav-item active" data-panel="overview">Visão Geral</button>
+            <button class="nav-item" data-panel="orders">Pedidos</button>
+            <button class="nav-item" data-panel="products">Produtos</button>
+            <button class="nav-item" data-panel="categories">Categorias</button>
+            <button class="nav-item" data-panel="reports">Relatórios</button>
+        </nav>
+
+        <div class="dashboard-content">
+            <!-- Overview Panel -->
+            <div class="panel active" id="overview">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Vendas Hoje</h3>
+                        <div class="stat-value" id="todaySales">R$ 0,00</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Pedidos Pendentes</h3>
+                        <div class="stat-value" id="pendingOrders">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Pedidos em Preparo</h3>
+                        <div class="stat-value" id="preparingOrders">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total do Mês</h3>
+                        <div class="stat-value" id="monthlySales">R$ 0,00</div>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>Vendas por Dia</h3>
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Produtos Mais Vendidos</h3>
+                        <canvas id="productsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Panel -->
+            <div class="panel" id="orders">
+                <div class="panel-header">
+                    <h2>Pedidos</h2>
+                    <div class="filters">
+                        <select id="orderStatus">
+                            <option value="ALL">Todos os Status</option>
+                            <option value="PENDING">Pendente</option>
+                            <option value="PREPARING">Preparando</option>
+                            <option value="READY">Pronto</option>
+                            <option value="DELIVERED">Entregue</option>
+                            <option value="CANCELLED">Cancelado</option>
+                        </select>
+                        <input type="date" id="orderDate">
+                        <button class="btn-primary" onclick="refreshOrders()">Atualizar</button>
+                    </div>
+                </div>
+                <div class="orders-list" id="ordersList">
+                    <!-- Orders will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Products Panel -->
+            <div class="panel" id="products">
+                <div class="panel-header">
+                    <h2>Produtos</h2>
+                    <button class="btn-primary" onclick="showAddProductModal()">Novo Produto</button>
+                </div>
+                <div class="products-grid" id="productsGrid">
+                    <!-- Products will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Categories Panel -->
+            <div class="panel" id="categories">
+                <div class="panel-header">
+                    <h2>Categorias</h2>
+                    <button class="btn-primary" onclick="showAddCategoryModal()">Nova Categoria</button>
+                </div>
+                <div class="categories-list" id="categoriesList">
+                    <!-- Categories will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Reports Panel -->
+            <div class="panel" id="reports">
+                <div class="panel-header">
+                    <h2>Relatórios</h2>
+                    <div class="filters">
+                        <input type="date" id="reportStartDate">
+                        <input type="date" id="reportEndDate">
+                        <select id="reportType">
+                            <option value="SALES">Vendas</option>
+                            <option value="PRODUCTS">Produtos</option>
+                            <option value="ORDERS">Pedidos</option>
+                        </select>
+                        <button class="btn-primary" onclick="generateReport()">Gerar Relatório</button>
+                        <button class="btn-secondary" onclick="exportReport()">Exportar</button>
+                    </div>
+                </div>
+                <div class="report-content" id="reportContent">
+                    <!-- Report will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <h2>Novo Produto</h2>
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label for="productName">Nome</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">Descrição</label>
+                    <textarea id="productDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Preço</label>
+                    <input type="number" id="productPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="productCategory">Categoria</label>
+                    <select id="productCategory" required>
+                        <!-- Categories will be loaded here -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productImage">Imagem (URL)</label>
+                    <input type="url" id="productImage">
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Salvar</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('addProductModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div id="addCategoryModal" class="modal">
+        <div class="modal-content">
+            <h2>Nova Categoria</h2>
+            <form id="addCategoryForm">
+                <div class="form-group">
+                    <label for="categoryName">Nome</label>
+                    <input type="text" id="categoryName" required>
+                </div>
+                <div class="form-group">
+                    <label for="categoryDescription">Descrição</label>
+                    <textarea id="categoryDescription"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Salvar</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal('addCategoryModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="db.js"></script>
+    <script src="script.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html> 
