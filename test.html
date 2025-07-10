@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Delícia de Pão</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Teste de Funcionalidade</h1>
+        
+        <button id="testBtn" class="btn btn-primary">Teste de Botão</button>
+        
+        <div id="testResult"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Teste: DOM carregado');
+            
+            const testBtn = document.getElementById('testBtn');
+            const testResult = document.getElementById('testResult');
+            
+            if (testBtn) {
+                console.log('Teste: Botão encontrado');
+                testBtn.addEventListener('click', () => {
+                    console.log('Teste: Botão clicado!');
+                    testResult.innerHTML = '<p>Botão funcionando!</p>';
+                });
+            } else {
+                console.log('Teste: Botão NÃO encontrado');
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -3,42 +3,331 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EvoApps - Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Delícia de Pão - Sistema de Encomendas</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="login-page">
-    <div class="login-container">
-        <div class="login-card">
-            <div class="login-header">
-                <i class="fas fa-cube logo-icon"></i>
-                <h1>EvoApps</h1>
-                <p>Sistema de Gestão</p>
-            </div>
-            <form id="loginForm" class="login-form">
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="username" name="username" placeholder="Usuário" required>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <img src="logo delicia de pão.avif" alt="Logo Delícia de Pão" style="width: 40px; height: 40px; object-fit: contain;">
+                    </div>
+                    <div class="logo-text">
+                        <h1>Delícia de Pão</h1>
+                        <span>Delicatessen</span>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="input-icon">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" id="password" name="password" placeholder="Senha" required>
-                    </div>
-                </div>
-                <button type="submit" class="btn-primary">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Entrar
+                <nav class="nav-desktop">
+                    <ul>
+                        <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
+                        <li><a href="#produtos" class="nav-link">Produtos</a></li>
+                        <li><a href="#encomendas" class="nav-link">Encomendas</a></li>
+                        <li><a href="#clientes" class="nav-link">Clientes</a></li>
+                    </ul>
+                </nav>
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
                 </button>
-            </form>
-            <div id="loginMessage" class="message"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation -->
+    <nav class="nav-mobile" id="navMobile">
+        <ul>
+            <li><a href="#dashboard" class="nav-link">Dashboard</a></li>
+            <li><a href="#produtos" class="nav-link">Produtos</a></li>
+            <li><a href="#encomendas" class="nav-link">Encomendas</a></li>
+            <li><a href="#clientes" class="nav-link">Clientes</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Dashboard Page -->
+            <section id="dashboard-page" class="page active">
+                <div class="page-header">
+                    <h2>Dashboard</h2>
+                    <p>Bem-vindo ao sistema de encomendas da Delícia de Pão</p>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="dashboard-card" data-action="nova-encomenda">
+                        <div class="card-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Nova Encomenda</h3>
+                            <p>Criar uma nova encomenda</p>
+                        </div>
+                        <div class="card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" data-action="visualizar-encomendas">
+                        <div class="card-icon">
+                            <i class="fas fa-list-alt"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Visualizar Encomendas</h3>
+                            <p>Gerenciar encomendas existentes</p>
+                        </div>
+                        <div class="card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" data-action="gerenciar-produtos">
+                        <div class="card-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Gerenciar Produtos</h3>
+                            <p>Cadastrar e editar produtos</p>
+                        </div>
+                        <div class="card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" data-action="gerenciar-clientes">
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Gerenciar Clientes</h3>
+                            <p>Cadastrar e editar clientes</p>
+                        </div>
+                        <div class="card-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4 id="total-encomendas">0</h4>
+                            <p>Total de Encomendas</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4 id="encomendas-pendentes">0</h4>
+                            <p>Encomendas Pendentes</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4 id="total-produtos">0</h4>
+                            <p>Produtos Cadastrados</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4 id="total-clientes">0</h4>
+                            <p>Clientes Cadastrados</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Produtos Page -->
+            <section id="produtos-page" class="page">
+                <div class="page-header">
+                    <h2>Gerenciar Produtos</h2>
+                    <button class="btn btn-primary" id="btnNovoProduto">
+                        <i class="fas fa-plus"></i>
+                        Novo Produto
+                    </button>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="filtroSetor">Setor:</label>
+                        <select id="filtroSetor" class="form-select">
+                            <option value="">Todos os setores</option>
+                            <option value="Padaria">Padaria</option>
+                            <option value="Confeitaria">Confeitaria</option>
+                            <option value="Salgaderia">Salgaderia</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filtroCategoria">Categoria:</label>
+                        <select id="filtroCategoria" class="form-select">
+                            <option value="">Todas as categorias</option>
+                            <option value="Salgados tradicionais Fritos">Salgados tradicionais Fritos</option>
+                            <option value="Salgados tradicionais Assados">Salgados tradicionais Assados</option>
+                            <option value="Tortas">Tortas</option>
+                            <option value="Doces Tradicionais">Doces Tradicionais</option>
+                            <option value="Doces Especiais">Doces Especiais</option>
+                            <option value="Pães">Pães</option>
+                            <option value="Salgados Especiais">Salgados Especiais</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="buscarProduto">Buscar:</label>
+                        <input type="text" id="buscarProduto" class="form-input" placeholder="Nome do produto...">
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="tabelaProdutos">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Preço</th>
+                                <th>Setor</th>
+                                <th>Categoria</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Produtos serão inseridos aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Encomendas Page -->
+            <section id="encomendas-page" class="page">
+                <div class="page-header">
+                    <h2>Gerenciar Encomendas</h2>
+                    <button class="btn btn-primary" id="btnNovaEncomenda">
+                        <i class="fas fa-plus"></i>
+                        Nova Encomenda
+                    </button>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="filtroStatus">Status:</label>
+                        <select id="filtroStatus" class="form-select">
+                            <option value="">Todos os status</option>
+                            <option value="Encomenda em Aberto">Encomenda em Aberto</option>
+                            <option value="Encomenda Realizada">Encomenda Realizada</option>
+                            <option value="Encomenda Cancelada">Encomenda Cancelada</option>
+                            <option value="Encomenda Retirada">Encomenda Retirada</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filtroData">Data:</label>
+                        <input type="date" id="filtroData" class="form-input">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="buscarEncomenda">Buscar:</label>
+                        <input type="text" id="buscarEncomenda" class="form-input" placeholder="Nome do cliente...">
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="tabelaEncomendas">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Telefone</th>
+                                <th>Data</th>
+                                <th>Horário</th>
+                                <th>Status</th>
+                                <th>Valor Total</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Encomendas serão inseridas aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Clientes Page -->
+            <section id="clientes-page" class="page">
+                <div class="page-header">
+                    <h2>Gerenciar Clientes</h2>
+                    <button class="btn btn-primary" id="btnNovoCliente">
+                        <i class="fas fa-plus"></i>
+                        Novo Cliente
+                    </button>
+                </div>
+
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="buscarCliente">Buscar:</label>
+                        <input type="text" id="buscarCliente" class="form-input" placeholder="Nome ou telefone...">
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="tabelaClientes">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Telefone</th>
+                                <th>Email</th>
+                                <th>Data Cadastro</th>
+                                <th>Frequência de Pedidos</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Clientes serão inseridos aqui via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal Container -->
+    <div id="modalContainer" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Modal Title</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be inserted here -->
+            </div>
         </div>
     </div>
-    <script src="db.js"></script>
-    <script src="utils.js"></script>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
     <script src="script.js"></script>
 </body>
-</html> 
+</html>
+
