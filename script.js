@@ -501,7 +501,26 @@ class DeliciaDePaoApp {
                 e.preventDefault();
                 const href = link.getAttribute('href');
                 if (href && href.startsWith('#')) {
+                    // Fechar menu mobile se estiver aberto
+                    const navMobile = document.getElementById('navMobile');
+                    if (navMobile && navMobile.classList.contains('active')) {
+                        navMobile.classList.remove('active');
+                    }
+                    
                     this.navigate(href.substring(1));
+                }
+            }
+        });
+        
+        // Fechar menu mobile quando clicar fora dele
+        document.addEventListener('click', (e) => {
+            const navMobile = document.getElementById('navMobile');
+            const menuToggle = document.getElementById('menuToggle');
+            
+            if (navMobile && navMobile.classList.contains('active')) {
+                // Se clicou fora do menu e não no botão de toggle
+                if (!navMobile.contains(e.target) && !menuToggle.contains(e.target)) {
+                    navMobile.classList.remove('active');
                 }
             }
         });

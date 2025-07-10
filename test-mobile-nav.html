@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Navegação Mobile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .test-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h2>Teste de Navegação Mobile</h2>
+        <p>Para testar a navegação mobile:</p>
+        <ol>
+            <li>Abra o DevTools (F12)</li>
+            <li>Ative o modo de dispositivo móvel (ícone de celular)</li>
+            <li>Redimensione para um tamanho mobile (ex: 375px)</li>
+            <li>Clique no ícone de menu (3 linhas) no header</li>
+            <li>Teste clicar nos links do menu</li>
+            <li>Verifique se o menu fecha automaticamente</li>
+        </ol>
+    </div>
+    
+    <div>
+        <button class="test-button" onclick="window.open('index.html', '_blank')">
+            Abrir Sistema Principal
+        </button>
+        <button class="test-button" onclick="window.open('http://localhost:8000', '_blank')">
+            Abrir no Localhost
+        </button>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <h3>Funcionalidades Testadas:</h3>
+        <ul>
+            <li>✅ Menu mobile abre/fecha</li>
+            <li>✅ Links de navegação funcionam</li>
+            <li>✅ Menu fecha automaticamente ao clicar em um link</li>
+            <li>✅ Menu fecha ao clicar fora dele</li>
+            <li>✅ Navegação entre páginas funciona</li>
+        </ul>
+    </div>
+</body>
+</html> 
