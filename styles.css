@@ -1167,7 +1167,213 @@ body {
 }
 
 .image-preview img {
+    max-width: 100%;
+    max-height: 200px;
     border-radius: var(--radius-sm);
+}
+
+/* Estilos para Visualização de Encomendas */
+.encomenda-details {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.encomenda-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.encomenda-status {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.encomenda-id {
+    font-size: var(--font-size-small);
+    color: var(--medium-gray);
+}
+
+.encomenda-sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.encomenda-section {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
     box-shadow: var(--shadow-sm);
+    border: 1px solid var(--light-gray);
+}
+
+.encomenda-section h4 {
+    color: var(--primary-red);
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-large);
+}
+
+.encomenda-section h4 i {
+    color: var(--primary-red);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-item label {
+    font-weight: 600;
+    color: var(--dark-gray);
+    font-size: var(--font-size-small);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-item span {
+    color: var(--dark-gray);
+    font-size: var(--font-size-base);
+}
+
+.produtos-table {
+    overflow-x: auto;
+    margin-top: var(--spacing-sm);
+}
+
+.produtos-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--primary-white);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.produtos-table th {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    padding: var(--spacing-sm);
+    text-align: left;
+    font-weight: 600;
+    font-size: var(--font-size-small);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.produtos-table td {
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--light-gray);
+    vertical-align: middle;
+}
+
+.produtos-table tr:last-child td {
+    border-bottom: none;
+}
+
+.produtos-table tfoot {
+    background: var(--light-gray);
+}
+
+.produtos-table tfoot td {
+    font-weight: 700;
+    color: var(--primary-red);
+    font-size: var(--font-size-large);
+}
+
+.valor-total {
+    color: var(--primary-red);
+    font-weight: 700;
+}
+
+.valor-pago {
+    color: var(--success);
+    font-weight: 600;
+}
+
+.valor-restante {
+    font-weight: 700;
+}
+
+.valor-restante.pago {
+    color: var(--success);
+}
+
+.valor-restante.parcial {
+    color: var(--warning);
+}
+
+.valor-restante.pendente {
+    color: var(--error);
+}
+
+.observacoes {
+    background: var(--light-gray);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary-red);
+}
+
+.observacoes p {
+    margin: 0;
+    color: var(--dark-gray);
+    font-style: italic;
+}
+
+.encomenda-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 2px solid var(--light-gray);
+}
+
+/* Responsividade para visualização de encomendas */
+@media (max-width: 768px) {
+    .encomenda-header {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        align-items: flex-start;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .encomenda-actions {
+        flex-direction: column;
+    }
+    
+    .encomenda-actions .btn {
+        width: 100%;
+    }
+    
+    .produtos-table {
+        font-size: var(--font-size-small);
+    }
+    
+    .produtos-table th,
+    .produtos-table td {
+        padding: var(--spacing-xs);
+    }
 }
 

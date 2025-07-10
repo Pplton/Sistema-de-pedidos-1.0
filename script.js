@@ -32,6 +32,14 @@ const SETORES_PRODUCAO = [
     'Salgaderia'
 ];
 
+// Lista de funcionários (pode ser substituída por cadastro futuramente)
+const FUNCIONARIOS = [
+    { id: '1', nome: 'Ana Souza' },
+    { id: '2', nome: 'Carlos Lima' },
+    { id: '3', nome: 'Fernanda Alves' },
+    { id: '4', nome: 'João Pedro' }
+];
+
 // Classe para Gerenciamento de Dados
 class DataManager {
     static save(key, data) {
@@ -903,6 +911,17 @@ class DeliciaDePaoApp {
         const formHTML = `
             <form id="encomendaForm" class="form-grid">
                 <div class="form-group">
+                    <label for="encomendaFuncionario">Funcionário Responsável *</label>
+                    <select id="encomendaFuncionario" class="form-select" required>
+                        <option value="">Selecione o funcionário</option>
+                        ${FUNCIONARIOS.map(func => 
+                            `<option value="${func.id}" ${encomenda && encomenda.funcionario && encomenda.funcionario.id === func.id ? 'selected' : ''}>${func.nome}</option>`
+                        ).join('')}
+                    </select>
+                    <div class="error-message" id="encomendaFuncionario-error"></div>
+                </div>
+                
+                <div class="form-group">
                     <label for="encomendaCliente">Cliente *</label>
                     <select id="encomendaCliente" class="form-select" required ${isEdit ? 'disabled' : ''}>
                         <option value="">Selecione um cliente</option>
@@ -1074,7 +1093,166 @@ class DeliciaDePaoApp {
     
     viewEncomenda(id) {
         console.log('Visualizando encomenda:', id);
-        UIManager.showToast('Visualização de encomenda será implementada', 'info');
+        const encomenda = this.state.getEncomendaById(id);
+        
+        if (!encomenda) {
+            UIManager.showToast('Encomenda não encontrada', 'error');
+            return;
+        }
+        
+        const modalContent = `
+            <div class="encomenda-details">
+                <div class="encomenda-header">
+                    <div class="encomenda-status">
+                        <span class="status-badge status-${encomenda.status.toLowerCase().replace(/\s+/g, '-').replace('encomenda-', '')}">
+                            ${encomenda.status}
+                        </span>
+                    </div>
+                    <div class="encomenda-id">
+                        <strong>ID: ${encomenda.id}</strong>
+                    </div>
+                </div>
+                
+                <div class="encomenda-sections">
+                    <!-- Informações do Cliente -->
+                    <div class="encomenda-section">
+                        <h4><i class="fas fa-user"></i> Informações do Cliente</h4>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Nome:</label>
+                                <span>${encomenda.cliente.nome}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Telefone:</label>
+                                <span>${encomenda.cliente.telefone}</span>
+                            </div>
+                            ${encomenda.cliente.email ? `
+                            <div class="info-item">
+                                <label>Email:</label>
+                                <span>${encomenda.cliente.email}</span>
+                            </div>
+                            ` : ''}
+                            ${encomenda.cliente.endereco && encomenda.cliente.endereco.rua ? `
+                            <div class="info-item full-width">
+                                <label>Endereço:</label>
+                                <span>${encomenda.cliente.endereco.rua}${encomenda.cliente.endereco.bairro ? ', ' + encomenda.cliente.endereco.bairro : ''}${encomenda.cliente.endereco.cidade ? ', ' + encomenda.cliente.endereco.cidade : ''}${encomenda.cliente.endereco.cep ? ' - CEP: ' + encomenda.cliente.endereco.cep : ''}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <!-- Informações da Encomenda -->
+                    <div class="encomenda-section">
+                        <h4><i class="fas fa-calendar"></i> Informações da Encomenda</h4>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Data da Encomenda:</label>
+                                <span>${UIManager.formatDate(encomenda.dataEncomenda)}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Horário:</label>
+                                <span>${encomenda.horarioEncomenda}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Data de Registro:</label>
+                                <span>${UIManager.formatDate(encomenda.dataRegistro)}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Funcionário Responsável:</label>
+                                <span>${encomenda.funcionario ? encomenda.funcionario.nome : 'Não informado'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Produtos da Encomenda -->
+                    <div class="encomenda-section">
+                        <h4><i class="fas fa-shopping-cart"></i> Produtos da Encomenda</h4>
+                        <div class="produtos-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th>Preço Unit.</th>
+                                        <th>Quantidade</th>
+                                        <th>Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${encomenda.itens.map(item => `
+                                        <tr>
+                                            <td>
+                                                <div class="produto-info-display">
+                                                    <strong>${item.produto.nome}</strong>
+                                                    <small>${item.produto.categoria}</small>
+                                                </div>
+                                            </td>
+                                            <td>${UIManager.formatCurrency(item.precoUnitario)}</td>
+                                            <td>${item.quantidade}</td>
+                                            <td><strong>${UIManager.formatCurrency(item.subtotal)}</strong></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="total-row">
+                                        <td colspan="3"><strong>Total da Encomenda:</strong></td>
+                                        <td><strong>${UIManager.formatCurrency(encomenda.valorTotal)}</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações de Pagamento -->
+                    <div class="encomenda-section">
+                        <h4><i class="fas fa-credit-card"></i> Informações de Pagamento</h4>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Forma de Pagamento:</label>
+                                <span>${encomenda.formaPagamento}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Valor Total:</label>
+                                <span class="valor-total">${UIManager.formatCurrency(encomenda.valorTotal)}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Valor Pago:</label>
+                                <span class="valor-pago">${UIManager.formatCurrency(encomenda.valorPago || 0)}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Valor Restante:</label>
+                                <span class="valor-restante ${(encomenda.valorTotal - (encomenda.valorPago || 0)) === 0 ? 'pago' : (encomenda.valorPago || 0) > 0 ? 'parcial' : 'pendente'}">
+                                    ${UIManager.formatCurrency(Math.max(0, encomenda.valorTotal - (encomenda.valorPago || 0)))}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Observações -->
+                    ${encomenda.observacoes ? `
+                    <div class="encomenda-section">
+                        <h4><i class="fas fa-sticky-note"></i> Observações</h4>
+                        <div class="observacoes">
+                            <p>${encomenda.observacoes}</p>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                
+                <div class="encomenda-actions">
+                    <button type="button" class="btn btn-secondary" onclick="UIManager.hideModal()">
+                        <i class="fas fa-times"></i> Fechar
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="app.editEncomenda('${encomenda.id}')">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="app.changeStatusEncomenda('${encomenda.id}')">
+                        <i class="fas fa-check"></i> Alterar Status
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        UIManager.showModal('Detalhes da Encomenda', modalContent);
     }
     
     editEncomenda(id) {
@@ -1412,6 +1590,15 @@ DeliciaDePaoApp.prototype.removeItemEncomenda = function(index) {
 DeliciaDePaoApp.prototype.saveEncomenda = function(encomendaId = null) {
     console.log('Salvando encomenda...');
     
+    // Verificar funcionário
+    const funcionarioSelect = document.getElementById('encomendaFuncionario');
+    const funcionarioId = funcionarioSelect ? funcionarioSelect.value : '';
+    const funcionario = FUNCIONARIOS.find(f => f.id === funcionarioId);
+    if (!funcionario) {
+        UIManager.showToast('Selecione o funcionário responsável pela encomenda', 'error');
+        return;
+    }
+    
     // Verificar se é um novo cliente ou cliente existente
     const selectCliente = document.getElementById('encomendaCliente');
     const novoClienteContainer = document.getElementById('novoClienteFormContainer');
@@ -1545,8 +1732,10 @@ DeliciaDePaoApp.prototype.saveEncomenda = function(encomendaId = null) {
     
     // Criar ou atualizar encomenda
     const encomendaData = {
+        funcionario: funcionario,
         cliente: cliente,
         dataEncomenda: new Date(dataEncomenda + 'T' + horarioEncomenda),
+        dataRegistro: new Date(), // Data/hora exata do registro
         horarioEncomenda: horarioEncomenda,
         itens: itens,
         valorTotal: valorTotal,
